@@ -9,12 +9,12 @@ DIR_CF_LIB = ../../cf_base/lib
 DIR_OBJECT = obj
 DIR_TARGET = .
 
-# common variables. Note that march=native first supported in GCC 4.2; 
+# common variables. Note that march=native first supported in GCC 4.2;
 # users of older version should pick a more appropriate value
 CC = gcc
 ARCH_NATIVE = $(shell uname -m)
-CFLAGS_NATIVE = -g -fno-common  
-CFLAGS_NATIVE += -fno-strict-aliasing -rdynamic -std=gnu99 -Wall 
+CFLAGS_NATIVE = -g -fno-common
+CFLAGS_NATIVE += -fno-strict-aliasing -rdynamic -std=gnu99 -Wall
 CFLAGS_NATIVE += -D_REENTRANT -D MARCH_$(ARCH_NATIVE)
 # CFLAGS_NATIVE += -O3 -fomit-frame-pointer
 
@@ -25,7 +25,7 @@ LDFLAGS = $(CFLAGS_NATIVE) -L$(DIR_LIB) -L$(DIR_CF_LIB)
 #LIBRARIES = -lev2citrusleaf /usr/local/lib/libevent-2.0.so.5.1.3 -lssl -lpthread -lrt
 LIBRARIES = -lev2citrusleaf -levent -lssl -lcrypto -lpthread -lrt
 
-HEADERS = 
+HEADERS =
 SOURCES = main.c
 TARGET = example
 
