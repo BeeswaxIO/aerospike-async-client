@@ -21,7 +21,7 @@ AS_CFLAGS = -D_FILE_OFFSET_BITS=64 -std=gnu99 -D_REENTRANT -D EXTERNAL_LOCKS
 MARCH_NATIVE = $(shell uname -m)
 
 #CFLAGS_NATIVE = -g  -march=native -fno-common  -rdynamic  -Wextra -Wredundant-decls $(AS_CFLAGS) -D MARCH_$(MARCH_NATIVE)
-CFLAGS_NATIVE = -g -O3  -fno-common  -rdynamic  -Wextra $(AS_CFLAGS) -D MARCH_$(MARCH_NATIVE)
+CFLAGS_NATIVE = -g -O3  -fno-common  -rdynamic  -Wextra $(AS_CFLAGS) -D MARCH_$(MARCH_NATIVE) $(BEESWAX_CFLAGS)
 
 #CFLAGS_64 = -g -m64 -march=nocona -fno-common  -rdynamic  -Wextra -Wredundant-decls $(AS_CFLAGS) -D MARCH_x86_64
 CFLAGS_64 = -g -O3 -m64 -march=nocona -fno-common -rdynamic -Wextra $(AS_CFLAGS) -D MARCH_x86_64

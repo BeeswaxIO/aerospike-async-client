@@ -1,6 +1,8 @@
 # Citrusleaf Foundation
 # Makefile
 
+export BEESWAX_CFLAGS
+
 all: libev2citrusleaf
 	$(MAKE) -C example
 	$(MAKE) -C example2
