@@ -4,4 +4,8 @@
 *.a
 *~
 example/example
-
+example2/example2
+example3/example3
+example4/example4
+example6/example6
+tests/loop_c_ev2/bin/
