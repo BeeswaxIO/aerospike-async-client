@@ -29,7 +29,7 @@ CFLAGS_64 = -g -O3 -m64 -march=nocona -fno-common -fno-strict-aliasing -rdynamic
 CFLAGS_32 = -g -O3 -m32 -march=nocona -fno-common -fno-strict-aliasing -rdynamic -Wall $(AS_CFLAGS) -D MARCH_i686
 
 CPP = g++
-CPPFLAGS = -g 
+CPPFLAGS = -g
 
 # Linux auto-sets to 64, MacOS doesn't
 ifeq (${SYSTEM},Darwin)

@@ -12,9 +12,9 @@ HEADERS = loop.h shash.h
 SOURCES = main.c loop.c shash.c
 TARGET = loop_c_ev
 
-INCLUDES = $(DIR_INCLUDE:%=-I%) 
+INCLUDES = $(DIR_INCLUDE:%=-I%)
 #LIBRARIES = -lev2citrusleaf  -lssl -lrt -levent
-LIBRARIES = -lev2citrusleaf -levent -lssl -lrt -lcrypto
+LIBRARIES = -lev2citrusleaf -levent -lssl -lrt -lcrypto -lpthread
 LDFLAGS += -L$(DEPTH)/lib
 
 OBJECTS = $(SOURCES:%.c=$(DIR_OBJECT)/%.o)
