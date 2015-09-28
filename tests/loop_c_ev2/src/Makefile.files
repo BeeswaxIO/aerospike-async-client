@@ -1,0 +1,7 @@
+# Citrusleaf Foundation
+# Makefiles
+#
+
+HEADERS = loop.h shash.h
+SOURCES = main.c loop.c shash.c
+

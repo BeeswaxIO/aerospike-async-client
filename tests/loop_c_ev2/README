@@ -1,0 +1,16 @@
+loopTest inserts a specified number of keys and then performs a number of repetitive operations in a loop while checking for integrity of the data.
+Usage:
+-h host [default 127.0.0.1] 
+-p port [default 3000]
+-n namespace [default test]
+-s set [default 'set']
+-b bin [default value]
+-t threads [default 32]
+-k keys [default 100000]
+-K key size [default 10]
+-V value size [default 20]
+-r random seed [default random]
+-m milliseconds timeout [default 200]
+-f do not follow cluster [default do follow]
+-v is verbose
+
