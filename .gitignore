@@ -4,8 +4,14 @@
 *.a
 *~
 example/example
+example/obj
 example2/example2
+example2/obj
 example3/example3
+example3/obj
 example4/example4
+example4/obj
 example6/example6
-tests/loop_c_ev2/bin/
+example6/obj
+tests/loop_c_ev2/bin
+tests/loop_c_ev2/obj
