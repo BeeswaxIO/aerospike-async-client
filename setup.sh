@@ -1,5 +1,8 @@
-#!/bin/bash
+#!/bin/bash -eu
+
 mkdir -p \
+    obj/native \
+    lib \
     example/obj \
     example2/obj \
     example3/obj \
