@@ -43,7 +43,7 @@ info_request_create()
 void
 info_request_destroy(cl_info_request *cir)
 {
-	
+
 	if (cir->rd_buf)	free(cir->rd_buf);
 	if (cir->wr_buf) {
 		if (cir->wr_buf != cir->wr_tmp)
@@ -55,7 +55,7 @@ info_request_destroy(cl_info_request *cir)
 struct event *
 info_request_get_network_event(cl_info_request *cir)
 {
-	return( (struct event *) &cir->event_space[0] );	
+	return( (struct event *) &cir->event_space[0] );
 }
 
 /*
@@ -75,7 +75,7 @@ citrusleaf_info_parse_single(char *values, char **value)
 	if (*values == 0)	return(-1);
 	*values = 0;
 	return(0);
-	
+
 }
 
 int
@@ -97,14 +97,14 @@ info_make_request(cl_info_request *cir, char *names)
 		cir->wr_buf = cir->wr_tmp;
 	}
 
-	// do byte-by-byte so we can convert :-(	
+	// do byte-by-byte so we can convert :-(
 	if (names) {
 		char *src = names;
 		char *dst = (char *) (cir->wr_buf + sizeof(cl_proto));
 		while (*src) {
-			if ((*src == ';') || (*src == ':') || (*src == ',')) 
+			if ((*src == ';') || (*src == ':') || (*src == ','))
 				*dst = '\n';
-			else 
+			else
 				*dst = *src;
 			src++;
 			dst++;
@@ -113,7 +113,7 @@ info_make_request(cl_info_request *cir, char *names)
 	}
 
 	cl_proto *proto = (cl_proto *) cir->wr_buf;
-	proto->sz = cir->wr_buf_size - sizeof(cl_proto); 
+	proto->sz = cir->wr_buf_size - sizeof(cl_proto);
 	proto->version = CL_PROTO_VERSION;
 	proto->type = CL_PROTO_TYPE_INFO;
 	cl_proto_swap(proto);
@@ -135,8 +135,8 @@ info_event_fn(evutil_socket_t fd, short event, void *udata)
 			if (rv > 0) {
 				cir->wr_buf_pos += rv;
 				if (cir->wr_buf_pos == cir->wr_buf_size) {
-					// changing from WRITE to READ requires redoing the set then the add 
-					event_assign(info_request_get_network_event(cir),cir->base, fd, EV_READ, info_event_fn, cir);		
+					// changing from WRITE to READ requires redoing the set then the add
+					event_assign(info_request_get_network_event(cir),cir->base, fd, EV_READ, info_event_fn, cir);
 				}
 			}
 			else if (rv == 0) {
@@ -155,7 +155,7 @@ info_event_fn(evutil_socket_t fd, short event, void *udata)
 			rv = recv(fd, (cf_socket_data_t*)&cir->rd_header_buf[cir->rd_header_pos], (cf_socket_size_t)(sizeof(cl_proto) - cir->rd_header_pos), MSG_NOSIGNAL | MSG_DONTWAIT);
 			if (rv > 0) {
 				cir->rd_header_pos += rv;
-			}				
+			}
 			else if (rv == 0) {
 				cf_info("read info failed: remote close: rv %d errno %d", rv, errno);
 				goto Fail;
@@ -170,7 +170,7 @@ info_event_fn(evutil_socket_t fd, short event, void *udata)
 				// calculate msg size
 				cl_proto *proto = (cl_proto *) cir->rd_header_buf;
 				cl_proto_swap(proto);
-				
+
 				// set up the read buffer
 				cir->rd_buf = (uint8_t*)malloc(proto->sz + 1);
 				if (!cir->rd_buf) {
@@ -194,7 +194,7 @@ info_event_fn(evutil_socket_t fd, short event, void *udata)
 						cf_close(fd);
 						info_request_destroy(cir);
 						cir = 0;
-						
+
 						uint64_t delta = cf_getms() - _s;
 						if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY cl_info event OK fn: %lu", delta);
 
@@ -213,19 +213,19 @@ info_event_fn(evutil_socket_t fd, short event, void *udata)
 		}
 	}
 
-	event_add(info_request_get_network_event(cir), 0 /*timeout*/);					
-	
+	event_add(info_request_get_network_event(cir), 0 /*timeout*/);
+
 	uint64_t delta = cf_getms() - _s;
 	if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY cl_info event again fn: %lu", delta);
 
 	return;
-	
+
 Fail:
 	(*cir->user_cb) ( -1, 0 , 0,cir->user_data );
 	event_del(info_request_get_network_event(cir)); // WARNING: this is not necessary. BOK says it is safe: maybe he's right, maybe wrong.
 	cf_close(fd);
 	info_request_destroy(cir);
-	
+
 	delta = cf_getms() - _s;
 	if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY: cl_info event fail OK took %lu", delta);
 }
@@ -239,14 +239,14 @@ Fail:
 
 int
 ev2citrusleaf_info_host(struct event_base *base, struct sockaddr_in *sa_in, char *names, int timeout_ms,
-	ev2citrusleaf_info_callback cb, void *udata) 
+	ev2citrusleaf_info_callback cb, void *udata)
 {
-	
+
 	uint64_t _s = cf_getms();
-	
+
 	cl_info_request *cir = info_request_create();
 	if (!cir)	return(-1);
-	
+
 	cir->user_cb = cb;
 	cir->user_data = udata;
 	cir->base = base;
@@ -262,28 +262,28 @@ ev2citrusleaf_info_host(struct event_base *base, struct sockaddr_in *sa_in, char
 
 		return -1;
 	}
-	
+
 	// fill the buffer while I'm waiting
 	if (0 != info_make_request(cir, names)) {
 		cf_warn("buffer fill failed");
-		
+
 		info_request_destroy(cir);
 		cf_close(fd);
-		
+
 		uint64_t delta = cf_getms() - _s;
 		if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY: info host bad request: %lu", delta);
-		
+
 		return(-1);
 	}
-	
+
 	// setup for event
 	event_assign(info_request_get_network_event(cir),cir->base, fd, EV_WRITE | EV_READ, info_event_fn, (void *) cir);
 	event_add(info_request_get_network_event(cir), 0/*timeout*/);
-	
+
 	uint64_t delta = cf_getms() - _s;
 	if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY: info host standard: %lu", delta);
 
-	
+
 	return(0);
 }
 
@@ -296,7 +296,7 @@ typedef struct {
 } info_resolve_state;
 
 // Got resolution - callback!
-// 
+//
 // WARNING! It looks like a bug to have the possibilities fo multiple callbacks
 // fired from this resolve function.
 //
@@ -309,7 +309,7 @@ info_resolve_cb(int result, cf_vector *sockaddr_in_v, void *udata)
 		cf_info("info resolution: async fail %d", result);
 		(irs->cb) ( -1 /*return value*/, 0, 0 ,irs->udata );
 		goto Done;
-	}		
+	}
 	for (uint32_t i=0; i < cf_vector_size(sockaddr_in_v) ; i++)
 	{
 		struct sockaddr_in  sa_in;
@@ -322,7 +322,7 @@ info_resolve_cb(int result, cf_vector *sockaddr_in_v, void *udata)
 			goto Done;
 		}
 	}
-Done:	
+Done:
 	free(irs->names);
 	free(irs);
 }
@@ -335,7 +335,7 @@ Done:
 //
 
 int
-ev2citrusleaf_info(struct event_base *base, struct evdns_base *dns_base, 
+ev2citrusleaf_info(struct event_base *base, struct evdns_base *dns_base,
 	char *host, short port, char *names, int timeout_ms,
 	ev2citrusleaf_info_callback cb, void *udata)
 {
@@ -357,19 +357,19 @@ ev2citrusleaf_info(struct event_base *base, struct evdns_base *dns_base,
 		if (!irs)	goto Done;
 		irs->cb = cb;
 		irs->udata = udata;
-		if (names) { 
+		if (names) {
 			irs->names = strdup(names);
 			if (!irs->names) goto Done;
 		}
 		else irs->names = 0;
 		irs->base = base;
 		irs->timeout_ms = timeout_ms;
-		if (0 != cl_lookup(dns_base, host, port, info_resolve_cb, irs)) 
+		if (0 != cl_lookup(dns_base, host, port, info_resolve_cb, irs))
 			goto Done;
 		irs = 0;
 	}
-	
-	
+
+
 Done:
 	if (irs) {
 		if (irs->names)	free(irs->names);

@@ -47,7 +47,7 @@ cl_lookup_immediate(char *hostname, short port, struct sockaddr_in *sin)
 		sin->sin_port = htons(port);
 		return(0);
 	}
-	
+
 	return(-1);
 }
 
@@ -55,7 +55,7 @@ cl_lookup_immediate(char *hostname, short port, struct sockaddr_in *sin)
 //
 // Do a lookup on the given name and port.
 // Async function using the libevent dns system
-// 
+//
 // Function will be called back with a stack-allocated
 // vector. You can run the vector, look at its size,
 // copy bits out.
@@ -78,13 +78,13 @@ void
 cl_lookup_result_fn(int result, char type, int count, int ttl, void *addresses, void *udata)
 {
 	cl_lookup_state *cls = (cl_lookup_state *) udata;
-	
+
 	uint64_t _s = cf_getms();
 
-	if ((result == 0) && (count > 0) && (type == DNS_IPv4_A)) 
+	if ((result == 0) && (count > 0) && (type == DNS_IPv4_A))
 	{
 		cf_vector_define(result_v, sizeof(struct sockaddr_in), 0);
-		
+
 		uint32_t *s_addr_a = (uint32_t *)addresses;
 		for (int i=0;i<count;i++) {
 			struct sockaddr_in sin;
@@ -94,19 +94,19 @@ cl_lookup_result_fn(int result, char type, int count, int ttl, void *addresses, 
 			sin.sin_port = htons(cls->port);
 			cf_vector_append(&result_v, &sin );
 		}
-		
+
 		// callback
 		(*cls->cb) (0, &result_v, cls->udata);
-		
-		cf_vector_destroy(&result_v);                        
+
+		cf_vector_destroy(&result_v);
 	}
 	else {
 		(*cls->cb) (-1, 0, cls->udata);
 	}
-	
+
 	// cleanup
 	free(cls);
-	
+
 	uint64_t delta = cf_getms() - _s;
 	if (delta > CL_LOG_DELAY_INFO) cf_info("CL DELAY: cl_lookup result fn: %lu", delta);
 }
@@ -121,7 +121,7 @@ cl_lookup(struct evdns_base *dns_base, char *hostname, short port, cl_lookup_asy
 	cls->cb = cb;
 	cls->udata = udata;
 	cls->port = port;
-	
+
 	// the req obj is what you use to cancel before the job is done
 	cls->evdns_req = evdns_base_resolve_ipv4( dns_base, (const char *)hostname, 0 /*search flag*/, cl_lookup_result_fn, cls);
 	if (0 == cls->evdns_req) {
@@ -134,6 +134,4 @@ cl_lookup(struct evdns_base *dns_base, char *hostname, short port, cl_lookup_asy
 	uint64_t delta = cf_getms() - _s;
 	if (delta > CL_LOG_DELAY_INFO) cf_info("CL_DELAY: cl_lookup: %lu", delta);
 	return(0);
-}	
-
-
+}
